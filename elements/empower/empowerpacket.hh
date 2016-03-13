@@ -111,6 +111,16 @@ struct empower_hello : public empower_header {
 	void set_downlink_bytes(uint32_t downlink_bytes)      	{ _downlink_bytes = htonl(downlink_bytes); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
+/* set channel packet format */
+struct empower_set_channel : public empower_header {
+  private:
+    uint8_t	_wtp[6];    
+    uint8_t _channel;
+  public:	
+	void set_channel(uint8_t channel)	{ _channel = channel; }
+	void set_wtp(EtherAddress wtp)		{ memcpy(_wtp, wtp.data(), 6); }
+} CLICK_SIZE_PACKED_ATTRIBUTE;
+
 /* probe request packet format */
 struct empower_probe_request : public empower_header {
   private:
