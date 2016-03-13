@@ -843,7 +843,7 @@ int EmpowerLVAPManager::handle_set_port(Packet *p, uint32_t offset) {
 }
 
 int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
-
+	para que se rompa
 	struct empower_set_channel *q = (struct empower_set_channel *) (p->data() + offset);	
 	
 	click_chatter("%{element} :: %s :: Arranco el proyecto.",
