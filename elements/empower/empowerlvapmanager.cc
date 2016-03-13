@@ -834,6 +834,16 @@ int EmpowerLVAPManager::handle_set_port(Packet *p, uint32_t offset) {
 
 }
 
+int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
+
+	struct empower_set_channel *q = (struct empower_set_channel *) (p->data() + offset);	
+	
+	click_chatter("%{element} :: %s :: Arranco el proyecto.",
+			      this,
+			      __func__);
+	return 0;
+}
+
 int EmpowerLVAPManager::handle_add_rssi_trigger(Packet *p, uint32_t offset) {
 	if (!_ers) {
 		click_chatter("%{element} :: %s :: RXStats Element not available!",
