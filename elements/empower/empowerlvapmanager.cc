@@ -1108,6 +1108,9 @@ void EmpowerLVAPManager::push(int, Packet *p) {
 		case EMPOWER_PT_LINK_STATS_REQUEST:
 			handle_link_stats_request(p, offset);
 			break;
+		case EMPOWER_PT_SET_CHANNEL:
+			handle_set_channel(p, offset);
+			break;
 		default:
 			click_chatter("%{element} :: %s :: Unknown packet type: %d",
 					      this,
@@ -1198,7 +1201,8 @@ enum {
 	H_LVAPS,
 	H_ADD_LVAP,
 	H_DEL_LVAP,
-	H_RECONNECT
+	H_RECONNECT,
+	H_CHANNEL
 };
 
 String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
@@ -1303,6 +1307,11 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 		}
 		return sa.take_string();
 	}
+	case H_CHANNEL: {
+		StringAccum sa;
+		sa << "El propio handler channel\n";
+		return sa.take_string();
+	}
 	default:
 		return String();
 	}
@@ -1378,9 +1387,10 @@ void EmpowerLVAPManager::add_handlers() {
 	add_read_handler("lvaps", read_handler, (void *) H_LVAPS);
 	add_read_handler("masks", read_handler, (void *) H_MASKS);
 	add_read_handler("bytes", read_handler, (void *) H_BYTES);
+	add_read_handler("channel", read_handler, (void *) H_CHANNEL);
 	add_write_handler("reconnect", write_handler, (void *) H_RECONNECT);
 	add_write_handler("ports", write_handler, (void *) H_PORTS);
-	add_write_handler("debug", write_handler, (void *) H_DEBUG);
+	add_write_handler("debug", write_handler, (void *) H_DEBUG);	
 }
 
 CLICK_ENDDECLS

@@ -57,6 +57,8 @@ enum empower_packet_types {
 	EMPOWER_PT_LINK_STATS_REQUEST = 0x29,    // ac -> wtp
 	EMPOWER_PT_LINK_STATS_RESPONSE = 0x30,   // wtp -> ac
 
+	// Set channel
+	EMPOWER_PT_SET_CHANNEL = 0x31,			// ac -> wtp
 };
 
 enum empower_port_flags {
