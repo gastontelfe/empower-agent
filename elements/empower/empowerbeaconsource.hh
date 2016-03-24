@@ -62,17 +62,12 @@ public:
 	void add_handlers();
 	void run_timer(Timer *);
 
-	void send_beacon(EtherAddress, int, int, bool);
-	void send_beacon(EtherAddress, EtherAddress, Vector<String>, int, int, bool);
-	void send_beacon(EtherAddress, EtherAddress, Vector<String>, String, int, int, bool);
 	void send_beacon(EtherAddress, EtherAddress, String, int, int, bool);
 
 	void push(int, Packet *);
 
 private:
 
-	class AvailableRates *_rtable;
-	class AvailableRates *_rtable_ht;
 	class EmpowerLVAPManager *_el;
 
 	unsigned int _period; // msecs

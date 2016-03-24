@@ -80,10 +80,6 @@ enum empower_bands_types {
 	EMPOWER_BT_HT40 = 0x2,
 };
 
-enum empower_bands_flags {
-	EMPOWER_RE_BLACKLISTED = (1<<0),
-};
-
 /* header format, common to all messages */
 struct empower_header {
   private:
@@ -155,9 +151,11 @@ struct empower_auth_request : public empower_header {
   private:
     uint8_t	_wtp[6];
     uint8_t	_sta[6];
+    uint8_t	_bssid[6];
   public:
 	void set_wtp(EtherAddress wtp) { memcpy(_wtp, wtp.data(), 6); }
 	void set_sta(EtherAddress sta) { memcpy(_sta, sta.data(), 6); }
+	void set_bssid(EtherAddress bssid) { memcpy(_bssid, bssid.data(), 6); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 /* auth response packet format */
@@ -173,10 +171,12 @@ struct empower_assoc_request : public empower_header {
   private:
     uint8_t	_wtp[6];
     uint8_t	_sta[6];
+    uint8_t	_bssid[6];
     char _ssid[];
   public:
 	void         set_wtp(EtherAddress wtp)		  { memcpy(_wtp, wtp.data(), 6); }
 	void         set_sta(EtherAddress sta)		  { memcpy(_sta, sta.data(), 6); }
+	void         set_bssid(EtherAddress bssid)	  { memcpy(_bssid, bssid.data(), 6); }
 	void         set_ssid(String ssid)		      { memcpy(&_ssid, ssid.data(), ssid.length()); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
@@ -371,7 +371,8 @@ private:
     uint8_t _band;
 	uint8_t	_sta[6];
 	uint8_t	_encap[6];
-	uint8_t	_bssid[6];
+	uint8_t	_net_bssid[6];
+	uint8_t	_lvap_bssid[6];
 	ssid_entry *_ssids[];
 public:
 	uint8_t      band()	        { return _band; }
@@ -380,7 +381,8 @@ public:
 	uint16_t     assoc_id()     { return ntohs(_assoc_id); }
 	EtherAddress sta()			{ return EtherAddress(_sta); }
 	EtherAddress encap()		{ return EtherAddress(_encap); }
-	EtherAddress bssid()		{ return EtherAddress(_bssid); }
+	EtherAddress net_bssid()		{ return EtherAddress(_net_bssid); }
+	EtherAddress lvap_bssid()		{ return EtherAddress(_lvap_bssid); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 /* del vap packet format */
@@ -401,7 +403,8 @@ private:
 	uint8_t	_encap[6];
     uint8_t _channel;
     uint8_t _band;
-	uint8_t	_bssid[6];
+	uint8_t	_net_bssid[6];
+	uint8_t	_lvap_bssid[6];
 	ssid_entry *_ssids[];
 public:
 	void set_band(uint8_t band)	        { _band = band; }
@@ -411,7 +414,8 @@ public:
 	void set_wtp(EtherAddress wtp)		{ memcpy(_wtp, wtp.data(), 6); }
 	void set_sta(EtherAddress sta)		{ memcpy(_sta, sta.data(), 6); }
 	void set_encap(EtherAddress encap)	{ memcpy(_encap, encap.data(), 6); }
-	void set_bssid(EtherAddress bssid)	{ memcpy(_bssid, bssid.data(), 6); }
+	void set_net_bssid(EtherAddress bssid)	{ memcpy(_net_bssid, bssid.data(), 6); }
+	void set_lvap_bssid(EtherAddress bssid)	{ memcpy(_lvap_bssid, bssid.data(), 6); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 /* set port packet format */
@@ -419,14 +423,12 @@ struct empower_set_port : public empower_header {
 private:
 	uint16_t _flags;
 	uint8_t	_sta[6];
-	uint8_t _tx_power;
 	uint16_t _rts_cts;
 	uint8_t _nb_mcs;
 	uint8_t *mcs[];
 public:
 	bool flag(int f)                          { return ntohs(_flags) & f;  }
 	EtherAddress sta()					      { return EtherAddress(_sta); }
-	uint8_t tx_power()					      { return _tx_power; }
 	uint16_t rts_cts()					      { return ntohs(_rts_cts); }
 	uint8_t nb_mcs()					      { return _nb_mcs; }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
@@ -439,7 +441,6 @@ private:
 	uint8_t	_sta[6];
     uint8_t _channel;
     uint8_t _band;
-	uint8_t _tx_power;
 	uint16_t _rts_cts;
 	uint8_t _nb_mcs;
 	uint8_t *mcs[];
@@ -449,7 +450,6 @@ public:
 	void      set_flag(uint16_t f)          { _flags = htons(ntohs(_flags) | f); }
 	void      set_wtp(EtherAddress wtp)		{ memcpy(_wtp, wtp.data(), 6); }
 	void      set_sta(EtherAddress sta)		{ memcpy(_sta, sta.data(), 6); }
-	void      set_tx_power(uint8_t tx_power){ _tx_power = tx_power; }
 	void      set_rts_cts(uint16_t rts_cts) { _rts_cts = htons(rts_cts); }
 	void      set_nb_mcs(uint8_t nb_mcs)    { _nb_mcs = nb_mcs; }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
@@ -560,7 +560,7 @@ private:
 	uint16_t _period;
 	uint8_t	_sta[6];
 public:
-    uint32_t trigger_id()                       { return ntohl(_trigger_id); }
+    uint32_t trigger_id()                    { return ntohl(_trigger_id); }
     int16_t limit()                          { return ntohs(_limit); }
     uint16_t period()                        { return ntohs(_period); }
 	EtherAddress sta()					     { return EtherAddress(_sta); }
@@ -569,44 +569,39 @@ public:
 /* add vap packet format */
 struct empower_add_vap : public empower_header {
 private:
-	uint16_t _flags;
     uint8_t _channel;
     uint8_t _band;
-	uint8_t	_bssid[6];
-	uint8_t _ssid_length;
+	uint8_t	_net_bssid[6];
 	char _ssid[];
 public:
 	uint8_t      band()	        { return _band; }
 	uint8_t      channel()	    { return _channel; }
-	bool         flag(int f)	{ return ntohs(_flags) & f;  }
-	EtherAddress bssid()		{ return EtherAddress(_bssid); }
-	uint8_t      ssid_length()	{ return _ssid_length; }
-	String       ssid()         { return String((char *) _ssid, WIFI_MIN(_ssid_length, WIFI_NWID_MAXSIZE)); }
+	EtherAddress net_bssid()		{ return EtherAddress(_net_bssid); }
+	String       ssid()         { int len = length() - 16; return String((char *) _ssid, WIFI_MIN(len, WIFI_NWID_MAXSIZE)); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 /* del vap packet format */
 struct empower_del_vap : public empower_header {
   private:
-    uint8_t	_bssid[6];
+    uint8_t	_net_bssid[6];
   public:
-	EtherAddress sta()							  { return EtherAddress(_bssid); }
+	EtherAddress net_bssid()							  { return EtherAddress(_net_bssid); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 /* lvap status packet format */
 struct empower_status_vap : public empower_header {
 private:
-	uint16_t _flags;
 	uint8_t	_wtp[6];
     uint8_t _channel;
     uint8_t _band;
-	uint8_t	_bssid[6];
+	uint8_t	_net_bssid[6];
 	char _ssid[];
 public:
 	void set_band(uint8_t band)	        { _band = band; }
+
 	void set_channel(uint8_t channel)	{ _channel = channel; }
-	void set_flag(uint16_t f)           { _flags = htons(ntohs(_flags) | f); }
 	void set_wtp(EtherAddress wtp)		{ memcpy(_wtp, wtp.data(), 6); }
-	void set_bssid(EtherAddress bssid)	{ memcpy(_bssid, bssid.data(), 6); }
+	void set_net_bssid(EtherAddress bssid)	{ memcpy(_net_bssid, bssid.data(), 6); }
 	void set_ssid(String ssid)		    { memcpy(&_ssid, ssid.data(), ssid.length()); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 

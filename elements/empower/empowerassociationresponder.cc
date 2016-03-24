@@ -23,12 +23,13 @@
 #include <click/packet_anno.hh>
 #include <click/error.hh>
 #include <clicknet/wifi.h>
+#include <elements/wifi/minstrel.hh>
 #include "empowerpacket.hh"
 #include "empowerlvapmanager.hh"
 CLICK_DECLS
 
 EmpowerAssociationResponder::EmpowerAssociationResponder() :
-		_rtable(0), _rtable_ht(0), _el(0), _debug(false) {
+		_el(0), _debug(false) {
 }
 
 EmpowerAssociationResponder::~EmpowerAssociationResponder() {
@@ -39,8 +40,6 @@ int EmpowerAssociationResponder::configure(Vector<String> &conf,
 
 	int ret = Args(conf, this, errh)
               .read_m("EL", ElementCastArg("EmpowerLVAPManager"), _el)
-			  .read_m("RT", ElementCastArg("AvailableRates"), _rtable)
-              .read("RT_HT", ElementCastArg("AvailableRates"), _rtable_ht)
 			  .read("DEBUG", _debug).complete();
 
 	return ret;
@@ -117,17 +116,6 @@ void EmpowerAssociationResponder::push(int, Packet *p) {
 	EtherAddress dst = EtherAddress(w->i_addr1);
 	EtherAddress bssid = EtherAddress(w->i_addr3);
 
-	//If the bssid does not match, ignore
-	if (ess->_bssid != bssid) {
-		click_chatter("%{element} :: %s :: BSSID does not match, expected %s received %s",
-				      this,
-				      __func__,
-				      ess->_bssid.unparse().c_str(),
-				      bssid.unparse().c_str());
-		p->kill();
-		return;
-	}
-
 	uint8_t *ptr = (uint8_t *) p->data() + sizeof(struct click_wifi);
 
 	/* capability */
@@ -200,21 +188,6 @@ void EmpowerAssociationResponder::push(int, Packet *p) {
 					  src.unparse().c_str());
 		p->kill();
 		return;
-	}
-
-	for (int i = 0; i < ess->_ssids.size(); i++) {
-		if (ess->_ssids[i] == ssid) {
-			break;
-		}
-		if (i == (ess->_ssids.size() - 1)) {
-			click_chatter("%{element} :: %s :: Invalid SSID %s from %s",
-						  this,
-						  __func__,
-						  ssid.c_str(),
-						  src.unparse().c_str());
-				p->kill();
-			return;
-		}
 	}
 
 	StringAccum sa;
@@ -368,11 +341,11 @@ void EmpowerAssociationResponder::push(int, Packet *p) {
 			click_chatter("rx_supported_mcs[%u]=%u", i, ht->rx_supported_mcs[i]);
 		}
 
-		if (ht->rx_supported_mcs[12] & WIFI_HT_CI_SM12_TX_MCS_SET_DEFINED && !(ht->rx_supported_mcs[12] & WIFI_HT_CI_SM12_TX_RX_MCS_SET_NOT_EQUAL)) {
+		if ((ht->rx_supported_mcs[12] & WIFI_HT_CI_SM12_TX_MCS_SET_DEFINED) && !(ht->rx_supported_mcs[12] & WIFI_HT_CI_SM12_TX_RX_MCS_SET_NOT_EQUAL)) {
 			sa << " TX " << ht_rates.size() / 8 << "SS";
 		}
 
-		if (ht->rx_supported_mcs[12] & WIFI_HT_CI_SM12_TX_MCS_SET_DEFINED && ht->rx_supported_mcs[12] & WIFI_HT_CI_SM12_TX_RX_MCS_SET_NOT_EQUAL) {
+		if ((ht->rx_supported_mcs[12] & WIFI_HT_CI_SM12_TX_MCS_SET_DEFINED) && (ht->rx_supported_mcs[12] & WIFI_HT_CI_SM12_TX_RX_MCS_SET_NOT_EQUAL)) {
 			int max_ss= ht->rx_supported_mcs[11] & WIFI_HT_CI_SM12_TX_MAX_SS_MASK >> WIFI_HT_CI_SM12_TX_MAX_SS_SHIFT;
 			if (max_ss == 0) {
 				sa << " TX 1SS";
@@ -399,7 +372,51 @@ void EmpowerAssociationResponder::push(int, Packet *p) {
 				      sa.take_string().c_str());
 	}
 
-	_el->send_association_request(src, ssid);
+	//If the bssid does not match, ignore
+	if (ess->_lvap_bssid != bssid) {
+		click_chatter("%{element} :: %s :: BSSID does not match, expected %s received %s",
+				      this,
+				      __func__,
+				      ess->_lvap_bssid.unparse().c_str(),
+				      bssid.unparse().c_str());
+		p->kill();
+		return;
+	}
+
+	Vector<String>::const_iterator it = ess->_ssids.begin();
+
+	while (it != ess->_ssids.end()) {
+		if (*it == ssid && ess->_lvap_bssid ==  bssid) {
+			break;
+		}
+		it++;
+	}
+
+	if (it == ess->_ssids.end()) {
+
+		VAPIter vit = _el->vaps()->begin();
+
+		while (vit != _el->vaps()->end()) {
+			if (vit.value()._ssid == ssid && vit.value()._net_bssid == bssid) {
+				break;
+			}
+			vit++;
+		}
+
+		if (vit == _el->vaps()->end()) {
+
+			click_chatter("%{element} :: %s :: Invalid SSID %s from %s",
+						  this,
+						  __func__,
+						  ssid.c_str(),
+						  src.unparse().c_str());
+			p->kill();
+			return;
+
+		}
+	}
+
+	_el->send_association_request(src, bssid, ssid);
 	p->kill();
 
 }
@@ -425,11 +442,6 @@ void EmpowerAssociationResponder::send_association_response(EtherAddress dst,
 											  2 + WIFI_RATES_MAXSIZE + /* xrates */
 											  0;
 
-	if (_rtable_ht) {
-		/* 802.11n HT Capabilities element*/
-		max_len += WIFI_HT_CAPS_SIZE;
-	}
-
 	WritablePacket *p = Packet::make(max_len);
 
 	if (!p) {
@@ -446,8 +458,8 @@ void EmpowerAssociationResponder::send_association_response(EtherAddress dst,
 	w->i_fc[1] = WIFI_FC1_DIR_NODS;
 
 	memcpy(w->i_addr1, dst.data(), 6);
-	memcpy(w->i_addr2, ess->_bssid.data(), 6);
-	memcpy(w->i_addr3, ess->_bssid.data(), 6);
+	memcpy(w->i_addr2, ess->_lvap_bssid.data(), 6);
+	memcpy(w->i_addr3, ess->_lvap_bssid.data(), 6);
 
 	w->i_dur = 0;
 	w->i_seq = 0;
@@ -470,7 +482,11 @@ void EmpowerAssociationResponder::send_association_response(EtherAddress dst,
 	actual_length += 2;
 
 	/* rates */
-	Vector<int> rates = _rtable->lookup(ess->_bssid);
+
+	Minstrel * rc = _el->rcs()->at(iface_id);
+	AvailableRates * rtable = rc->rtable();
+
+	Vector<int> rates = rtable->lookup(ess->_sta);
 	ptr[0] = WIFI_ELEMID_RATES;
 	ptr[1] = WIFI_MIN(WIFI_RATE_SIZE, rates.size());
 	for (int x = 0; x < WIFI_MIN(WIFI_RATE_SIZE, rates.size()); x++) {
@@ -497,37 +513,10 @@ void EmpowerAssociationResponder::send_association_response(EtherAddress dst,
 		actual_length += 2 + num_xrates;
 	}
 
-	/* 802.11n HT capabilities field*/
-	if (_rtable_ht) {
-
-		struct click_wifi_ht_caps *ht = (struct click_wifi_ht_caps *) ptr;
-		ht->type = WIFI_HT_CAPS_TYPE;
-		ht->len = WIFI_HT_CAPS_SIZE;
-
-		ht->ht_caps_info |= WIFI_HT_CI_CHANNEL_WIDTH_SET;
-		ht->ht_caps_info |= WIFI_HT_CI_SGI_40;
-		ht->ht_caps_info |= WIFI_HT_CI_TX_STBC;
-		ht->ht_caps_info |= WIFI_HT_CI_RX_STBC_1SS << WIFI_HT_CI_RX_STBC_SHIFT;
-		ht->ht_caps_info |= WIFI_HT_CI_HT_DSSS_CCK;
-		ht->ht_caps_info |= WIFI_HT_CI_SM_PS_DISABLED << WIFI_HT_CI_SM_PS_SHIFT;
-
-		Vector<int> ht_rates = _rtable_ht->lookup(ess->_bssid);
-
-		for (int i = 0; i < ht_rates.size(); i++) {
-			int a = ht_rates[i] / 8;
-			int b = ht_rates[i] % 8;
-			ht->rx_supported_mcs[a] |= (1<<b);
-		}
-
-		ht->rx_supported_mcs[12] |= WIFI_HT_CI_SM12_TX_MCS_SET_DEFINED;
-
-		ptr += 2 + WIFI_HT_CAPS_SIZE;
-		actual_length += 2 + WIFI_HT_CAPS_SIZE;
-
-	}
-
 	p->take(max_len - actual_length);
+
 	_el->send_status_lvap(dst);
+
 	SET_PAINT_ANNO(p, iface_id);
 	output(0).push(p);
 
