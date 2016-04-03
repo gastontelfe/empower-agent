@@ -249,6 +249,8 @@ public:
 	int handle_set_port(Packet *, uint32_t);
 	int handle_frames_request(Packet *, uint32_t);
 	int handle_link_stats_request(Packet *, uint32_t);
+	// agrego cambio de canal
+	int handle_set_channel(Packet *, uint32_t);
 
 	void send_hello();
 	void send_probe_request(EtherAddress, String, uint8_t);

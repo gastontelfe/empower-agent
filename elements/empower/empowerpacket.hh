@@ -62,6 +62,9 @@ enum empower_packet_types {
 	EMPOWER_PT_DEL_VAP = 0x32,         // ac -> wtp
 	EMPOWER_PT_STATUS_VAP = 0x33,      // wtp -> ac
 
+	// Set channel
+	EMPOWER_PT_SET_CHANNEL = 0x34,		// ac -> wtp
+
 };
 
 enum empower_port_flags {
@@ -110,6 +113,16 @@ struct empower_hello : public empower_header {
 	void set_wtp(EtherAddress wtp)	  	  					{ memcpy(_wtp, wtp.data(), 6); }
 	void set_uplink_bytes(uint32_t uplink_bytes)          	{ _uplink_bytes = htonl(uplink_bytes); }
 	void set_downlink_bytes(uint32_t downlink_bytes)      	{ _downlink_bytes = htonl(downlink_bytes); }
+} CLICK_SIZE_PACKED_ATTRIBUTE;
+
+/* set channel packet format */
+struct empower_set_channel : public empower_header {
+  private:
+    uint8_t	_wtp[6];    
+    uint8_t _channel;
+  public:	
+	void set_channel(uint8_t channel)	{ _channel = channel; }
+	void set_wtp(EtherAddress wtp)		{ memcpy(_wtp, wtp.data(), 6); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 /* probe request packet format */

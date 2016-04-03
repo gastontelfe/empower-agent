@@ -30,6 +30,8 @@
 #include "empoweropenauthresponder.hh"
 #include "empowerassociationresponder.hh"
 #include "empowerrxstats.hh"
+#include <stdio.h>
+
 CLICK_DECLS
 
 EmpowerLVAPManager::EmpowerLVAPManager() :
@@ -835,6 +837,27 @@ int EmpowerLVAPManager::handle_del_vap(Packet *p, uint32_t offset) {
 
 }
 
+int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
+
+	struct empower_set_channel *q = (struct empower_set_channel *) (p->data() + offset);	
+	
+	FILE* in;
+
+	if (!(in = popen("iw dev wlan0 set channel 3", "r"))) {
+		click_chatter("%{element} :: %s :: Error cambiando el canal.",
+			      this,
+			      __func__);		
+	}
+
+	pclose(in);
+
+	click_chatter("%{element} :: %s :: Arranco el proyecto.",
+			      this,
+			      __func__);
+
+	return 0;
+}
+
 int EmpowerLVAPManager::handle_add_lvap(Packet *p, uint32_t offset) {
 
 
@@ -1256,6 +1279,9 @@ void EmpowerLVAPManager::push(int, Packet *p) {
 		case EMPOWER_PT_LINK_STATS_REQUEST:
 			handle_link_stats_request(p, offset);
 			break;
+		case EMPOWER_PT_SET_CHANNEL:
+			handle_set_channel(p, offset);
+			break;
 		default:
 			click_chatter("%{element} :: %s :: Unknown packet type: %d",
 					      this,
@@ -1382,7 +1408,8 @@ enum {
 	H_EMPOWER_IFACE,
 	H_EMPOWER_HWADDR,
 	H_ELEMENTS,
-	H_INTERFACES
+	H_INTERFACES,
+	H_CHANNEL,
 };
 
 String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
@@ -1519,6 +1546,20 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 		}
 		return sa.take_string();
 	}
+	case H_CHANNEL: {
+		StringAccum sa;
+		sa << "El propio handler channel\n";
+		FILE* in;
+
+		if (!(in = popen("iw dev wlan0 set channel 3", "r"))) {
+			sa << "Error popen en cambio de canal";		
+		}
+
+		pclose(in);
+		sa << "Cambio de canal completado.";
+
+		return sa.take_string();
+	}
 	default:
 		return String();
 	}
@@ -1611,6 +1652,7 @@ void EmpowerLVAPManager::add_handlers() {
 	add_read_handler("empower_hwaddr", read_handler, (void *) H_EMPOWER_HWADDR);
 	add_read_handler("elements", read_handler, (void *) H_ELEMENTS);
 	add_read_handler("interfaces", read_handler, (void *) H_INTERFACES);
+	add_read_handler("channel", read_handler, (void *) H_CHANNEL);
 	add_write_handler("reconnect", write_handler, (void *) H_RECONNECT);
 	add_write_handler("ports", write_handler, (void *) H_PORTS);
 	add_write_handler("debug", write_handler, (void *) H_DEBUG);
