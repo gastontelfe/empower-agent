@@ -847,6 +847,11 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 	sa << "iw dev wlan0 set channel ";
 	sa << channel;
 
+	click_chatter("%{element} :: %s :: %s",
+			      this,
+			      __func__,
+			      sa.take_string());
+
 	click_chatter("%{element} :: %s :: CAMBIANDO AL CANAL %d.",
 				      this,
 				      __func__,
