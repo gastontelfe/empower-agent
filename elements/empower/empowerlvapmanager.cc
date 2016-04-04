@@ -843,11 +843,12 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 	
 	uint8_t channel = q->channel();
 	
-	char str[15];
-	sprintf(str, "%d", channel);
+	//TODO: aprender a castear de verdad
+	char channel_str[15];
+	sprintf(channel_str, "%d", channel);
 
-	String sa = "iwinfo";
-	//sa << str;	
+	String sa = "iw dev wlan0 set channel ";
+	sa += channel_str;
 
 	const char* command = sa.c_str();
 	click_chatter("%{element} :: %s :: %s",
