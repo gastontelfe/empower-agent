@@ -843,7 +843,6 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 	struct empower_set_channel *q = (struct empower_set_channel *) (p->data() + offset);	
 	
 	uint8_t channel = q->channel();
-
 	ostringstream convert;   // stream used for the conversion
 	convert << channel;      // insert the textual representation of 'Number' in the characters in the stream
 
