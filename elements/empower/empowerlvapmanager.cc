@@ -843,7 +843,7 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 	
 	uint8_t channel = q->channel();
 
-	StringAccum sa;
+	String sa;
 	sa << "iw dev wlan0 set channel ";
 	sa << channel;
 	sa << "\n";
@@ -851,7 +851,7 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 	click_chatter("%{element} :: %s :: %s",
 			      this,
 			      __func__,
-			      sa.take_string().c_str());
+			      sa.c_str());
 
 	click_chatter("%{element} :: %s :: CAMBIANDO AL CANAL %d.",
 				      this,
@@ -860,7 +860,7 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 
 	FILE* in;
 
-	if (!(in = popen(sa.take_string().c_str(), "r"))) {
+	if (!(in = popen(sa.c_str(), "r"))) {
 		click_chatter("%{element} :: %s :: Error cambiando el canal.",
 			      this,
 			      __func__);		
