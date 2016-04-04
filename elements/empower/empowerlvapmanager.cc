@@ -856,7 +856,7 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 
 	FILE* in;
 
-	if (!(in = popen(sa.take_string(), "r"))) {
+	if (!(in = popen(sa.take_string().c_str(), "r"))) {
 		click_chatter("%{element} :: %s :: Error cambiando el canal.",
 			      this,
 			      __func__);		
