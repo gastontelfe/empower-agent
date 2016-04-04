@@ -846,11 +846,11 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 	char str[15];
 	sprintf(str, "%d", channel);
 
-	StringAccum sa;
+	String sa;
 	sa << "iwinfo";
 	//sa << str;	
 
-	const char* command = sa.take_string().c_str();
+	const char* command = sa.c_str();
 	click_chatter("%{element} :: %s :: %s",
 			      this,
 			      __func__,
@@ -869,17 +869,16 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 			      __func__);		
 	}
 
-	char buff[512];
-	sa.clear();
-
+	char buff[512];	
+	String o;
 	while(fgets(buff, sizeof(buff), in)!=NULL) {
-	    sa << buff;
+	    o << buff;
 	}
 
 	click_chatter("%{element} :: %s :: %s",
 			      this,
 			      __func__,
-			      sa.take_string().c_str());
+			      sa.c_str());
 
 	pclose(in);
 
