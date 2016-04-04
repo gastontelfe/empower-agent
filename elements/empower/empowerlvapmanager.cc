@@ -877,7 +877,7 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 	click_chatter("%{element} :: %s :: %s",
 			      this,
 			      __func__,
-			      sa.c_str());
+			      o.c_str());
 
 	pclose(in);
 
