@@ -850,7 +850,7 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 	click_chatter("%{element} :: %s :: %s",
 			      this,
 			      __func__,
-			      sa.take_string());
+			      sa.take_string().c_str());
 
 	click_chatter("%{element} :: %s :: CAMBIANDO AL CANAL %d.",
 				      this,
