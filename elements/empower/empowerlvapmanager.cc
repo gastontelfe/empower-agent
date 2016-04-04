@@ -841,9 +841,7 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 
 	struct empower_set_channel *q = (struct empower_set_channel *) (p->data() + offset);	
 	
-	uint8_t channel = 100;
-	//q->channel()
-
+	uint8_t channel = q->channel();
 
 	StringAccum sa;
 	sa << "iw dev wlan0 set channel ";
