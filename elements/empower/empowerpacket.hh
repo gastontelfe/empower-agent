@@ -118,11 +118,9 @@ struct empower_hello : public empower_header {
 /* set channel packet format */
 struct empower_set_channel : public empower_header {
   private:
-    uint8_t	_wtp[6];    
     uint8_t _channel;
   public:	
-	uint8_t channel()	{ return _channel; }
-	EtherAddress wtp()		{ return EtherAddress(_wtp); }
+	uint8_t channel()	{ return _channel; }	
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 /* probe request packet format */
