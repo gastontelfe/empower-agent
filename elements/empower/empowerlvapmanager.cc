@@ -863,7 +863,7 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 
 	pclose(in);
 
-	click_chatter("%{element} :: %s :: Arranco el proyecto.",
+	click_chatter("%{element} :: %s :: Arranco el proyecto!",
 			      this,
 			      __func__);
 
