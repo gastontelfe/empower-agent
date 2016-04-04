@@ -121,8 +121,8 @@ struct empower_set_channel : public empower_header {
     uint8_t	_wtp[6];    
     uint8_t _channel;
   public:	
-	void set_channel(uint8_t channel)	{ _channel = channel; }
-	void set_wtp(EtherAddress wtp)		{ memcpy(_wtp, wtp.data(), 6); }
+	uint8_t channel()	{ return _channel; }
+	EtherAddress wtp()		{ return EtherAddress(_wtp); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 /* probe request packet format */
