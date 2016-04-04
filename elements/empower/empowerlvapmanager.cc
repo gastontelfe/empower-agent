@@ -869,6 +869,18 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 			      __func__);		
 	}
 
+	char buff[512];
+	sa.clear();
+
+	while(fgets(buff, sizeof(buff), in)!=NULL) {
+	    sa << buff;
+	}
+
+	click_chatter("%{element} :: %s :: %s",
+			      this,
+			      __func__,
+			      sa.take_string().c_str());
+
 	pclose(in);
 
 	click_chatter("%{element} :: %s :: Arranco el proyecto!!",
