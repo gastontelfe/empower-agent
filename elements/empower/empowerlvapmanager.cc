@@ -1583,8 +1583,14 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 		sa << "El propio handler channel\n";
 		FILE* in;
 
-		if (!(in = popen("iw dev wlan0 set channel 3", "r"))) {
-			sa << "Error popen en cambio de canal";		
+		if (!(in = popen("iwinfo", "r"))) {
+			sa << "Error popen en cambio de canal";
+		}
+
+		char buff[512];		
+
+		while(fgets(buff, sizeof(buff), in)!=NULL) {
+		    sa << buff;
 		}
 
 		pclose(in);
