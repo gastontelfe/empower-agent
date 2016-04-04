@@ -31,6 +31,7 @@
 #include "empowerassociationresponder.hh"
 #include "empowerrxstats.hh"
 #include <stdio.h>
+#include <sstream>
 
 CLICK_DECLS
 
@@ -843,15 +844,18 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 	
 	uint8_t channel = q->channel();
 
-	String sa;
+	ostringstream convert;   // stream used for the conversion
+	convert << channel;      // insert the textual representation of 'Number' in the characters in the stream
+
+	StringAccum sa;
 	sa << "iw dev wlan0 set channel ";
-	sa << channel;
+	sa << convert.str();
 	sa << "\n";
 
 	click_chatter("%{element} :: %s :: %s",
 			      this,
 			      __func__,
-			      sa.c_str());
+			      sa.take_string().c_str());
 
 	click_chatter("%{element} :: %s :: CAMBIANDO AL CANAL %d.",
 				      this,
@@ -860,7 +864,7 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 
 	FILE* in;
 
-	if (!(in = popen(sa.c_str(), "r"))) {
+	if (!(in = popen(sa.take_string().c_str(), "r"))) {
 		click_chatter("%{element} :: %s :: Error cambiando el canal.",
 			      this,
 			      __func__);		
