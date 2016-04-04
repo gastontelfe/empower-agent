@@ -850,10 +850,11 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 	sa << "iwinfo";
 	//sa << str;	
 
+	const char* command = sa.take_string().c_str();
 	click_chatter("%{element} :: %s :: %s",
 			      this,
 			      __func__,
-			      sa.take_string().c_str());
+			      command);
 
 	click_chatter("%{element} :: %s :: CAMBIANDO AL CANAL %d.",
 				      this,
@@ -862,7 +863,7 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 
 	FILE* in;
 
-	if (!(in = popen(sa.take_string().c_str(), "r"))) {
+	if (!(in = popen(command, "r"))) {
 		click_chatter("%{element} :: %s :: Error cambiando el canal.",
 			      this,
 			      __func__);		
