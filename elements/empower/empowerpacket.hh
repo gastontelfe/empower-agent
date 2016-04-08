@@ -64,6 +64,7 @@ enum empower_packet_types {
 
 	// Set channel
 	EMPOWER_PT_SET_CHANNEL = 0x34,		// ac -> wtp
+//	EMPOWER_PT_CHANNEL_CHANGED = 0x35	// wtp -> ac
 
 };
 
@@ -122,6 +123,14 @@ struct empower_set_channel : public empower_header {
   public:	
 	uint8_t channel()	{ return _channel; }	
 } CLICK_SIZE_PACKED_ATTRIBUTE;
+
+/* channel changed packet format */
+// struct empower_channel_changed : public empower_header {
+//   private:
+// 	uint8_t	_wtp[6];            /* EtherAddress */
+//   public:
+// 	void set_wtp(EtherAddress wtp)	  	  					{ memcpy(_wtp, wtp.data(), 6); }
+// } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 /* probe request packet format */
 struct empower_probe_request : public empower_header {

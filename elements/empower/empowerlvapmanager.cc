@@ -315,6 +315,37 @@ void EmpowerLVAPManager::send_hello() {
 
 }
 
+/*void EmpowerLVAPManager::send_channel_changed() {
+
+	WritablePacket *p = Packet::make(sizeof(empower_channel_changed));
+
+	if (!p) {
+		click_chatter("%{element} :: %s :: cannot make packet!",
+				      this,
+				      __func__);
+		return;
+	}
+
+	memset(p->data(), 0, p->length());
+
+	empower_channel_changed *channel_changed = (struct empower_channel_changed *) (p->data());
+
+	channel_changed->set_version(_empower_version);
+	channel_changed->set_length(sizeof(empower_channel_changed));
+	channel_changed->set_type(EMPOWER_PT_CHANNEL_CHANGED);
+	channel_changed->set_seq(get_next_seq());
+	channel_changed->set_wtp(_wtp);
+
+	if (_debug) {
+		click_chatter("%{element} :: %s :: sending channel changed!",
+				      this,
+				      __func__);
+	}
+
+	checked_output_push(0, p);
+
+}*/
+
 void EmpowerLVAPManager::send_status_lvap(EtherAddress sta) {
 
 	Vector<String> ssids;
@@ -881,6 +912,11 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 			      o.c_str());
 
 	pclose(in);
+
+	ResourceElement elm = ResourceElement(channel, EMPOWER_BT_L20);
+	// TODO hacerlo bien
+	_ifaces_to_elements.set(0, elm);
+	_elements_to_ifaces.set(elm, 0);
 
 	click_chatter("%{element} :: %s :: Arranco el proyecto!!",
 			      this,
