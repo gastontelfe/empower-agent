@@ -915,7 +915,7 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 
 	ResourceElement elm = elements().begin().key();
 	elm._channel = channel;
-	send_caps_response();
+	//send_caps_response();
 
 	return 0;
 }
