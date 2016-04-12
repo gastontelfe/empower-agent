@@ -915,7 +915,7 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 
 	//ResourceElement elm = ResourceElement(channel, EMPOWER_BT_L20);
 	
-	ResourceElement elm = elements().begin().value();
+	ResourceElement elm = elements().begin().key();
 	elm._channel = channel;
 
 	// click_chatter("%{element} :: %s :: Arranco el proyecto!!",
