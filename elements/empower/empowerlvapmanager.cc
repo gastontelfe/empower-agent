@@ -913,14 +913,14 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 
 	pclose(in);
 
-	ResourceElement elm = ResourceElement(channel, EMPOWER_BT_L20);
+	//ResourceElement elm = ResourceElement(channel, EMPOWER_BT_L20);
 	
 	ResourceElement elm = elements().begin().get();
 	elm._channel = channel;
-	
-	click_chatter("%{element} :: %s :: Arranco el proyecto!!",
-			      this,
-			      __func__);
+
+	// click_chatter("%{element} :: %s :: Arranco el proyecto!!",
+	// 		      this,
+	// 		      __func__);
 
 	return 0;
 }
