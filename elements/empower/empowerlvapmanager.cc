@@ -913,8 +913,11 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 
 	pclose(in);
 
-	ResourceElement elm = elements().begin().key();
-	elm._channel = channel;
+	elements().clear();
+	ResourceElement elm = ResourceElement(channel, EMPOWER_BT_L20);
+	_ifaces_to_elements.set(0, elm);
+	_elements_to_ifaces.set(elm, 0);
+	
 	//send_caps_response();
 
 	return 0;
