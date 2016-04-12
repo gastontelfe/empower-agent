@@ -320,6 +320,18 @@ public:
 	void set_nb_ports_elements(uint8_t nb_ports_elements)				{ _nb_ports_elements = nb_ports_elements; }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
+/* set channel response packet format */
+struct empower_set_channel_response : public empower_header {
+private:
+  uint8_t	_wtp[6];
+  uint8_t	_nb_resources_elements;
+  uint8_t	_nb_ports_elements;
+public:
+	void set_wtp(EtherAddress wtp)		          						{ memcpy(_wtp, wtp.data(), 6); }
+	void set_nb_resources_elements(uint8_t nb_resources_elements)	  	{ _nb_resources_elements = nb_resources_elements; }
+	void set_nb_ports_elements(uint8_t nb_ports_elements)				{ _nb_ports_elements = nb_ports_elements; }
+} CLICK_SIZE_PACKED_ATTRIBUTE;
+
 /* counters entryformat */
 struct counters_entry {
   private:

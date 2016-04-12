@@ -262,6 +262,8 @@ public:
 	void send_counters_response(EtherAddress, uint32_t);
 	void send_img_response(NeighborTable *, int, EtherAddress, uint32_t, empower_bands_types, uint8_t);
 	void send_caps_response();
+	// Agrego el set channel response
+	void send_set_channel_response();
 	void send_rssi_trigger(EtherAddress, uint32_t, uint8_t, uint8_t, uint8_t);
 	void send_summary_trigger(SummaryTrigger *);
 	void send_summary(EtherAddress, uint32_t, const Vector<Frame> &);
