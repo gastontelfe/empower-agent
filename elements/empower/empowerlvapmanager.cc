@@ -830,7 +830,7 @@ void EmpowerLVAPManager::send_set_channel_response() {
 	chan->set_version(_empower_version);
 	chan->set_length(len);
 	chan->set_seq(get_next_seq());
-	chan->set_type(EMPOWER_PT_CAPS_RESPONSE);
+	chan->set_type(EMPOWER_PT_CHANNEL_RESPONSE);
 	chan->set_wtp(_wtp);
 	chan->set_nb_resources_elements(elements().size());
 	chan->set_nb_ports_elements(_ports.size());
