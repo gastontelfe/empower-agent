@@ -896,7 +896,7 @@ void EmpowerLVAPManager::send_scan_response() {
 
 	memset(p->data(), 0, p->length());
 
-	empower_set_channel_response *chan = (struct empower_set_channel_response *) (p->data());
+	empower_scan_response *chan = (struct empower_scan_response *) (p->data());
 	chan->set_version(_empower_version);
 	chan->set_length(len + o.length());
 	chan->set_seq(get_next_seq());
