@@ -862,10 +862,9 @@ void EmpowerLVAPManager::send_set_channel_response() {
 }
 
 void EmpowerLVAPManager::send_scan_response() {
-	click_chatter("%{element} :: %s :: %s :: AAAAAAAAAAAAAAAAAAAaa",
+	click_chatter("%{element} :: %s :: AAAAAAAAAAAAAAAAAAAaa",
 			      this,
-			      __func__,
-			      o.c_str());
+			      __func__);
 
 	// FILE* in;
 
