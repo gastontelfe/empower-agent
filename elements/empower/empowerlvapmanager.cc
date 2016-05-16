@@ -862,48 +862,53 @@ void EmpowerLVAPManager::send_set_channel_response() {
 }
 
 void EmpowerLVAPManager::send_scan_response() {
-	FILE* in;
-
-	if (!(in = popen("/root/scan", "r"))) {
-		click_chatter("%{element} :: %s :: Failed to execute scan.",
-			      this,
-			      __func__);		
-	}
-
-	char buff[512];	
-	String o;
-	while(fgets(buff, sizeof(buff), in)!=NULL) {
-	    o += buff;
-	}
-
-	click_chatter("%{element} :: %s :: %s",
+	click_chatter("%{element} :: %s :: %s :: AAAAAAAAAAAAAAAAAAAaa",
 			      this,
 			      __func__,
 			      o.c_str());
 
-	pclose(in);
+	// FILE* in;
 
-	int len = sizeof(empower_scan_response);
+	// if (!(in = popen("/root/scan", "r"))) {
+	// 	click_chatter("%{element} :: %s :: Failed to execute scan.",
+	// 		      this,
+	// 		      __func__);		
+	// }
 
-	WritablePacket *p = Packet::make(len);
+	// char buff[512];	
+	// String o;
+	// while(fgets(buff, sizeof(buff), in)!=NULL) {
+	//     o += buff;
+	// }
 
-	if (!p) {
-		click_chatter("%{element} :: %s :: cannot make packet!",
-					  this,
-					  __func__);
-		return;
-	}
+	// click_chatter("%{element} :: %s :: %s",
+	// 		      this,
+	// 		      __func__,
+	// 		      o.c_str());
 
-	memset(p->data(), 0, p->length());
+	// pclose(in);
 
-	empower_scan_response *chan = (struct empower_scan_response *) (p->data());
-	chan->set_version(_empower_version);
-	chan->set_length(len + o.length());
-	chan->set_seq(get_next_seq());
-	chan->set_type(EMPOWER_PT_SCAN_RESPONSE);
-	chan->set_scan(o);
+	// int len = sizeof(empower_scan_response);
 
-	output(0).push(p);
+	// WritablePacket *p = Packet::make(len);
+
+	// if (!p) {
+	// 	click_chatter("%{element} :: %s :: cannot make packet!",
+	// 				  this,
+	// 				  __func__);
+	// 	return;
+	// }
+
+	// memset(p->data(), 0, p->length());
+
+	// empower_scan_response *chan = (struct empower_scan_response *) (p->data());
+	// chan->set_version(_empower_version);
+	// chan->set_length(len + o.length());
+	// chan->set_seq(get_next_seq());
+	// chan->set_type(EMPOWER_PT_SCAN_RESPONSE);
+	// chan->set_scan(o);
+
+	// output(0).push(p);
 }
 
 int EmpowerLVAPManager::handle_add_vap(Packet *p, uint32_t offset) {
