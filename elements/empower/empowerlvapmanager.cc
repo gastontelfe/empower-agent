@@ -986,6 +986,34 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 	return 0;
 }
 
+int handle_scan_request(Packet *, uint32_t) {
+
+	struct empower_scan_request *q = (struct empower_scan_request *) (p->data() + offset);
+
+	FILE* in;
+
+	if (!(in = popen("/root/scan", "r"))) {
+		click_chatter("%{element} :: %s :: Error ejecutando scan.",
+			      this,
+			      __func__);		
+	}
+
+	char buff[512];	
+	String o;
+	while(fgets(buff, sizeof(buff), in)!=NULL) {
+	    o += buff;
+	}
+
+	click_chatter("%{element} :: %s :: %s",
+			      this,
+			      __func__,
+			      o.c_str());
+
+	pclose(in);
+
+	return 0;
+}
+
 int EmpowerLVAPManager::handle_add_lvap(Packet *p, uint32_t offset) {
 
 
@@ -1409,6 +1437,9 @@ void EmpowerLVAPManager::push(int, Packet *p) {
 			break;
 		case EMPOWER_PT_SET_CHANNEL:
 			handle_set_channel(p, offset);
+			break;
+		case EMPOWER_PT_SCAN_REQUEST:
+			handle_scan_request(p, offset);
 			break;
 		default:
 			click_chatter("%{element} :: %s :: Unknown packet type: %d",

@@ -251,6 +251,8 @@ public:
 	int handle_link_stats_request(Packet *, uint32_t);
 	// agrego cambio de canal
 	int handle_set_channel(Packet *, uint32_t);
+	// handle scan request
+	int handle_scan_request(Packet *, uint32_t);
 
 	void send_hello();
 	void send_probe_request(EtherAddress, String, uint8_t);
@@ -268,6 +270,8 @@ public:
 	void send_summary_trigger(SummaryTrigger *);
 	void send_summary(EtherAddress, uint32_t, const Vector<Frame> &);
 	void send_link_stats_response(EtherAddress, uint32_t);
+	// send scan results
+	//void send_scan_response(EtherAddress, uint32_t);
 
 	EtherAddress wtp() { return _wtp; }
 	EtherAddress empower_hwaddr() { return _empower_hwaddr; }

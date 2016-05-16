@@ -64,7 +64,10 @@ enum empower_packet_types {
 
 	// Set channel
 	EMPOWER_PT_SET_CHANNEL = 0x34,		// ac -> wtp
-	EMPOWER_PT_CHANNEL_RESPONSE = 0x35	// wtp -> ac
+	EMPOWER_PT_CHANNEL_RESPONSE = 0x35,	// wtp -> ac
+
+	// scan request
+	EMPOWER_PT_SCAN_REQUEST = 0x36,		// ac -> wtp
 
 };
 
@@ -122,6 +125,11 @@ struct empower_set_channel : public empower_header {
     uint8_t _channel;
   public:	
 	uint8_t channel()	{ return _channel; }	
+} CLICK_SIZE_PACKED_ATTRIBUTE;
+
+/* scan request packet */
+struct empower_scan_request : public empower_header {
+  	
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 /* channel changed packet format */
