@@ -862,30 +862,26 @@ void EmpowerLVAPManager::send_set_channel_response() {
 }
 
 void EmpowerLVAPManager::send_scan_response() {
-	click_chatter("%{element} :: %s :: AAAAAAAAAAAAAAAAAAAaa",
+	FILE* in;
+
+	if (!(in = popen("/root/scan", "r"))) {
+		click_chatter("%{element} :: %s :: Failed to execute scan.",
 			      this,
-			      __func__);
+			      __func__);		
+	}
 
-	// FILE* in;
+	char buff[512];	
+	String o;
+	while(fgets(buff, sizeof(buff), in)!=NULL) {
+	    o += buff;
+	}
 
-	// if (!(in = popen("/root/scan", "r"))) {
-	// 	click_chatter("%{element} :: %s :: Failed to execute scan.",
-	// 		      this,
-	// 		      __func__);		
-	// }
+	click_chatter("%{element} :: %s :: %s",
+			      this,
+			      __func__,
+			      o.c_str());
 
-	// char buff[512];	
-	// String o;
-	// while(fgets(buff, sizeof(buff), in)!=NULL) {
-	//     o += buff;
-	// }
-
-	// click_chatter("%{element} :: %s :: %s",
-	// 		      this,
-	// 		      __func__,
-	// 		      o.c_str());
-
-	// pclose(in);
+	pclose(in);
 
 	// int len = sizeof(empower_scan_response);
 
