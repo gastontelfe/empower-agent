@@ -986,7 +986,7 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 	return 0;
 }
 
-int handle_scan_request(Packet *p, uint32_t offset) {
+int EmpowerLVAPManager::handle_scan_request(Packet *p, uint32_t offset) {
 
 	struct empower_scan_request *q = (struct empower_scan_request *) (p->data() + offset);
 
