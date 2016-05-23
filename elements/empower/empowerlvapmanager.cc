@@ -1008,7 +1008,7 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 	_ifaces_to_elements.set(0, elm);
 	_elements_to_ifaces.set(elm, 0);
 	
-	send_set_channel_response();
+	// send_set_channel_response();
 
 	return 0;
 }
