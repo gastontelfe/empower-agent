@@ -198,9 +198,7 @@ public:
 
 	inline size_t hashcode() const {
 		return _channel | _band;
-	}
-
-	void set_channel(int channel) const { _channel = channel; }
+	}	
 
 	inline String unparse() const {
 		StringAccum sa;
