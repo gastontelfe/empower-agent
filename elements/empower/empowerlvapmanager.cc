@@ -1854,8 +1854,7 @@ void EmpowerLVAPManager::add_handlers() {
 	add_write_handler("reconnect", write_handler, (void *) H_RECONNECT);
 	add_write_handler("ports", write_handler, (void *) H_PORTS);
 	add_write_handler("debug", write_handler, (void *) H_DEBUG);
-	add_read_handler("channel", read_handler, (void *) H_CHANNEL);
-	add_read_handler("testchannel", read_handler, (void *) H_TEST_CHANNEL);
+	add_read_handler("channel", read_handler, (void *) H_CHANNEL);	
 }
 
 CLICK_ENDDECLS
