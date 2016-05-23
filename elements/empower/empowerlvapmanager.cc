@@ -995,11 +995,15 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 
 	pclose(in);
 
-	_ifaces_to_elements.clear();
-	_elements_to_ifaces.clear();
-	ResourceElement elm = ResourceElement(channel, EMPOWER_BT_L20);
-	_ifaces_to_elements.set(0, elm);
-	_elements_to_ifaces.set(elm, 0);
+	for (IfIter iter = _elements_to_ifaces.begin(); iter.live(); iter++) {
+		iter.key().set_channel(channel);
+	}
+
+	// _ifaces_to_elements.clear();
+	// _elements_to_ifaces.clear();
+	// ResourceElement elm = ResourceElement(channel, EMPOWER_BT_L20);
+	// _ifaces_to_elements.set(0, elm);
+	// _elements_to_ifaces.set(elm, 0);
 	
 	send_set_channel_response();
 

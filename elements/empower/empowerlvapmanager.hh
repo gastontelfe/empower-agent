@@ -200,6 +200,8 @@ public:
 		return _channel | _band;
 	}
 
+	void set_channel(int channel){ _channel = channel; }
+
 	inline String unparse() const {
 		StringAccum sa;
 		sa << "(";
