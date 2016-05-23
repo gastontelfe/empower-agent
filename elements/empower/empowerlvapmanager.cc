@@ -1741,22 +1741,16 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 	case H_CHANNEL: {
 		StringAccum sa;
 		sa << "El propio handler channel\n";
-		FILE* in;
 
-		if (!(in = popen("iwinfo", "r"))) {
-			sa << "Error popen en cambio de canal";
+		EtherAddress _hwaddr;
+		for (IfIter iter = td->_elements_to_ifaces.begin(); iter.live(); iter++) {
+			_hwaddr = iter.key()._hwaddr;
+			break;
 		}
 
-		char buff[512];		
+		ResourceElement elm = ResourceElement(_hwaddr, channel, EMPOWER_BT_L20);
 
-		while(fgets(buff, sizeof(buff), in)!=NULL) {
-		    sa << buff;
-		}
-
-		pclose(in);
-		sa << "Cambio de canal completado.";
-
-		return sa.take_string();
+		return elm.unparse();
 	}
 	default:
 		return String();
@@ -1861,6 +1855,7 @@ void EmpowerLVAPManager::add_handlers() {
 	add_write_handler("ports", write_handler, (void *) H_PORTS);
 	add_write_handler("debug", write_handler, (void *) H_DEBUG);
 	add_read_handler("channel", read_handler, (void *) H_CHANNEL);
+	add_read_handler("testchannel", read_handler, (void *) H_TEST_CHANNEL);
 }
 
 CLICK_ENDDECLS
