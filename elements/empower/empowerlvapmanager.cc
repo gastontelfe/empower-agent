@@ -805,6 +805,68 @@ void EmpowerLVAPManager::send_caps_response() {
 
 }
 
+void EmpowerLVAPManager::send_set_channel_response() {
+
+	int len = sizeof(empower_set_channel_response);
+
+	len += elements().size() * sizeof(struct resource_elements_entry);
+
+	for (PortsIter iter = _ports.begin(); iter.live(); iter++) {
+		len += sizeof(struct port_elements_entry);
+	}
+
+	WritablePacket *p = Packet::make(len);
+
+	if (!p) {
+		click_chatter("%{element} :: %s :: cannot make packet!",
+					  this,
+					  __func__);
+		return;
+	}
+
+	if (_debug) {
+		click_chatter("%{element} :: %s :: sending set channel response!",
+				      this,
+				      __func__);
+	}
+
+	memset(p->data(), 0, p->length());
+
+	empower_set_channel_response *chan = (struct empower_set_channel_response *) (p->data());
+	chan->set_version(_empower_version);
+	chan->set_length(len);
+	chan->set_seq(get_next_seq());
+	chan->set_type(EMPOWER_PT_CHANNEL_RESPONSE);
+	chan->set_wtp(_wtp);
+	chan->set_nb_resources_elements(elements().size());
+	chan->set_nb_ports_elements(_ports.size());
+
+	uint8_t *ptr = (uint8_t *) chan;
+	ptr += sizeof(struct empower_set_channel_response);
+
+	uint8_t *end = ptr + (len - sizeof(struct empower_set_channel_response));
+
+	for (IfIter iter = elements().begin(); iter.live(); iter++) {
+		assert (ptr <= end);
+		resource_elements_entry *entry = (resource_elements_entry *) ptr;
+		entry->set_channel(iter.key()._channel);
+		entry->set_band(iter.key()._band);
+		ptr += sizeof(struct resource_elements_entry);
+	}
+
+	for (PortsIter iter = _ports.begin(); iter.live(); iter++) {
+		assert (ptr <= end);
+		port_elements_entry *entry = (port_elements_entry *) ptr;
+		entry->set_hwaddr(iter.value()._hwaddr);
+		entry->set_iface(iter.value()._iface);
+		entry->set_port_id(iter.value()._port_id);
+		ptr += sizeof(struct port_elements_entry);
+	}
+
+	output(0).push(p);
+
+}
+
 int EmpowerLVAPManager::handle_add_vap(Packet *p, uint32_t offset) {
 
 	struct empower_add_vap *add_vap = (struct empower_add_vap *) (p->data() + offset);
@@ -886,6 +948,62 @@ int EmpowerLVAPManager::handle_del_vap(Packet *p, uint32_t offset) {
 
 	return 0;
 
+}
+
+int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
+
+	struct empower_set_channel *q = (struct empower_set_channel *) (p->data() + offset);	
+	
+	uint8_t channel = q->channel();
+	
+	//TODO: aprender a castear de verdad
+	char channel_str[15];
+	sprintf(channel_str, "%d", channel);
+
+	String sa = "iw dev wlan0 set channel ";
+	sa += channel_str;
+
+	const char* command = sa.c_str();
+	click_chatter("%{element} :: %s :: %s",
+			      this,
+			      __func__,
+			      command);
+
+	click_chatter("%{element} :: %s :: CAMBIANDO AL CANAL %d.",
+				      this,
+				      __func__,
+				      channel);
+
+	FILE* in;
+
+	if (!(in = popen(command, "r"))) {
+		click_chatter("%{element} :: %s :: Error cambiando el canal.",
+			      this,
+			      __func__);		
+	}
+
+	char buff[512];	
+	String o;
+	while(fgets(buff, sizeof(buff), in)!=NULL) {
+	    o += buff;
+	}
+
+	click_chatter("%{element} :: %s :: %s",
+			      this,
+			      __func__,
+			      o.c_str());
+
+	pclose(in);
+
+	_ifaces_to_elements.clear();
+	_elements_to_ifaces.clear();
+	ResourceElement elm = ResourceElement(channel, EMPOWER_BT_L20);
+	_ifaces_to_elements.set(0, elm);
+	_elements_to_ifaces.set(elm, 0);
+	
+	send_set_channel_response();
+
+	return 0;
 }
 
 int EmpowerLVAPManager::handle_add_lvap(Packet *p, uint32_t offset) {
@@ -1340,6 +1458,9 @@ void EmpowerLVAPManager::push(int, Packet *p) {
 		case EMPOWER_PT_LINK_STATS_REQUEST:
 			handle_link_stats_request(p, offset);
 			break;
+		case EMPOWER_PT_SET_CHANNEL:
+			handle_set_channel(p, offset);
+			break;
 		default:
 			click_chatter("%{element} :: %s :: Unknown packet type: %d",
 					      this,
@@ -1467,7 +1588,8 @@ enum {
 	H_EMPOWER_HWADDR,
 	H_ELEMENTS,
 	H_INTERFACES,
-	H_INFO_BSSIDS
+	H_INFO_BSSIDS,
+	H_CHANNEL
 };
 
 String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
@@ -1609,6 +1731,26 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 		}
 		return sa.take_string();
 	}
+	case H_CHANNEL: {
+		StringAccum sa;
+		sa << "El propio handler channel\n";
+		FILE* in;
+
+		if (!(in = popen("iwinfo", "r"))) {
+			sa << "Error popen en cambio de canal";
+		}
+
+		char buff[512];		
+
+		while(fgets(buff, sizeof(buff), in)!=NULL) {
+		    sa << buff;
+		}
+
+		pclose(in);
+		sa << "Cambio de canal completado.";
+
+		return sa.take_string();
+	}
 	default:
 		return String();
 	}
@@ -1711,6 +1853,7 @@ void EmpowerLVAPManager::add_handlers() {
 	add_write_handler("reconnect", write_handler, (void *) H_RECONNECT);
 	add_write_handler("ports", write_handler, (void *) H_PORTS);
 	add_write_handler("debug", write_handler, (void *) H_DEBUG);
+	add_read_handler("channel", read_handler, (void *) H_CHANNEL);
 }
 
 CLICK_ENDDECLS

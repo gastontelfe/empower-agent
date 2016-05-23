@@ -63,6 +63,10 @@ enum empower_packet_types {
 	EMPOWER_PT_DEL_VAP = 0x32,         // ac -> wtp
 	EMPOWER_PT_STATUS_VAP = 0x33,      // wtp -> ac
 
+	// Set channel
+	EMPOWER_PT_SET_CHANNEL = 0x34,		// ac -> wtp
+	EMPOWER_PT_CHANNEL_RESPONSE = 0x35	// wtp -> ac
+
 };
 
 enum empower_port_flags {
@@ -111,6 +115,14 @@ struct empower_hello : public empower_header {
 	void set_wtp(EtherAddress wtp)	  	  					{ memcpy(_wtp, wtp.data(), 6); }
 	void set_uplink_bytes(uint32_t uplink_bytes)          	{ _uplink_bytes = htonl(uplink_bytes); }
 	void set_downlink_bytes(uint32_t downlink_bytes)      	{ _downlink_bytes = htonl(downlink_bytes); }
+} CLICK_SIZE_PACKED_ATTRIBUTE;
+
+/* set channel packet format */
+struct empower_set_channel : public empower_header {
+  private:
+    uint8_t _channel;
+  public:	
+	uint8_t channel()	{ return _channel; }	
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 /* probe request packet format */
@@ -197,6 +209,18 @@ public:
 	void set_nb_ports_elements(uint8_t nb_ports_elements)				{ _nb_ports_elements = nb_ports_elements; }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
+/* set channel response packet format */
+struct empower_set_channel_response : public empower_header {
+private:
+  uint8_t	_wtp[6];
+  uint8_t	_nb_resources_elements;
+  uint8_t	_nb_ports_elements;
+public:
+	void set_wtp(EtherAddress wtp)		          						{ memcpy(_wtp, wtp.data(), 6); }
+	void set_nb_resources_elements(uint8_t nb_resources_elements)	  	{ _nb_resources_elements = nb_resources_elements; }
+	void set_nb_ports_elements(uint8_t nb_ports_elements)				{ _nb_ports_elements = nb_ports_elements; }
+} CLICK_SIZE_PACKED_ATTRIBUTE;
+	
 
 /* link stats request packet format */
 struct empower_link_stats_request : public empower_header {
