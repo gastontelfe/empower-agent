@@ -849,6 +849,7 @@ void EmpowerLVAPManager::send_set_channel_response() {
 	for (IfIter iter = elements().begin(); iter.live(); iter++) {
 		assert (ptr <= end);
 		resource_elements_entry *entry = (resource_elements_entry *) ptr;
+		entry->set_hwaddr(iter.key()._hwaddr);
 		entry->set_channel(iter.key()._channel);
 		entry->set_band(iter.key()._band);
 		ptr += sizeof(struct resource_elements_entry);
@@ -1008,7 +1009,7 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 	_ifaces_to_elements.set(0, elm);
 	_elements_to_ifaces.set(elm, 0);
 	
-	// send_set_channel_response();
+	send_set_channel_response();
 
 	return 0;
 }
