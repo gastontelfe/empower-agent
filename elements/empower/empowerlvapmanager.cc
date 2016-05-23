@@ -1748,7 +1748,7 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 			break;
 		}
 
-		ResourceElement elm = ResourceElement(_hwaddr, channel, EMPOWER_BT_L20);
+		ResourceElement elm = ResourceElement(_hwaddr, 9, EMPOWER_BT_L20);
 
 		return elm.unparse();
 	}
