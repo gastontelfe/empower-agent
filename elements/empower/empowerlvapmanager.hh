@@ -196,13 +196,13 @@ public:
 			_hwaddr(hwaddr), _channel(channel), _band(band) {
 	}
 
-	inline size_t hashcode() const {
+	inline size_t hashcode() {
 		return _channel | _band;
 	}
 
-	void set_channel(int channel){ _channel = channel; }
+	void set_channel(int channel) { _channel = channel; }
 
-	inline String unparse() const {
+	inline String unparse() {
 		StringAccum sa;
 		sa << "(";
 		sa << _hwaddr.unparse();
