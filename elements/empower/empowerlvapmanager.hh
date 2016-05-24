@@ -294,8 +294,8 @@ public:
 	void send_summary(EtherAddress, uint32_t, const Vector<Frame> &);
 	void send_link_stats_response(EtherAddress, uint32_t);
 	// send scan results
-	void send_scan_response(EtherAddress, uint32_t);
-	
+	void send_scan_response();
+
 	EtherAddress wtp() { return _wtp; }
 	EtherAddress empower_hwaddr() { return _empower_hwaddr; }
 	LVAP* lvaps() { return &_lvaps; }

@@ -1014,14 +1014,16 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 	return 0;
 }
 
-int EmpowerLVAPManager::handle_scan_request(Packet *, uint32_t) {
+int EmpowerLVAPManager::handle_scan_request(Packet *p, uint32_t offset) {
+	send_scan_response();
+	return 0;
+}
 
-	struct empower_scan_request *q = (struct empower_scan_request *) (p->data() + offset);
-
+void EmpowerLVAPManager::send_scan_response() {
 	FILE* in;
 
 	if (!(in = popen("/root/scan", "r"))) {
-		click_chatter("%{element} :: %s :: Error ejecutando scan.",
+		click_chatter("%{element} :: %s :: Failed to execute scan.",
 			      this,
 			      __func__);		
 	}
@@ -1039,7 +1041,27 @@ int EmpowerLVAPManager::handle_scan_request(Packet *, uint32_t) {
 
 	pclose(in);
 
-	return 0;
+	// int len = sizeof(empower_scan_response);
+
+	// WritablePacket *p = Packet::make(len);
+
+	// if (!p) {
+	// 	click_chatter("%{element} :: %s :: cannot make packet!",
+	// 				  this,
+	// 				  __func__);
+	// 	return;
+	// }
+
+	// memset(p->data(), 0, p->length());
+
+	// empower_scan_response *chan = (struct empower_scan_response *) (p->data());
+	// chan->set_version(_empower_version);
+	// chan->set_length(len + o.length());
+	// chan->set_seq(get_next_seq());
+	// chan->set_type(EMPOWER_PT_SCAN_RESPONSE);
+	// chan->set_scan(o);
+
+	// output(0).push(p);
 }
 
 int EmpowerLVAPManager::handle_add_lvap(Packet *p, uint32_t offset) {
@@ -1783,7 +1805,7 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 		// ResourceElement elm = ResourceElement(_hwaddr, 9, EMPOWER_BT_L20);
 
 		// return elm.unparse();
-		
+
 		FILE* in;
 
 		if (!(in = popen("/root/scan", "r"))) {

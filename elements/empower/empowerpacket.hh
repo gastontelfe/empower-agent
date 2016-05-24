@@ -68,6 +68,7 @@ enum empower_packet_types {
 	EMPOWER_PT_CHANNEL_RESPONSE = 0x35,	// wtp -> ac
 	// scan request
 	EMPOWER_PT_SCAN_REQUEST = 0x36,		// ac -> wtp
+	EMPOWER_PT_SCAN_RESPONSE = 0x37,	// wtp -> ac
 
 };
 
@@ -132,6 +133,12 @@ struct empower_scan_request : public empower_header {
   	
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
+struct empower_scan_response : public empower_header {
+	private:
+	  	char _scan[];
+	public:
+		void set_scan(String scan_result)		    { memcpy(&_scan, scan_result.data(), scan_result.length()); }
+} CLICK_SIZE_PACKED_ATTRIBUTE;
 
 /* probe request packet format */
 struct empower_probe_request : public empower_header {
