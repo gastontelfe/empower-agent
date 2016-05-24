@@ -65,7 +65,7 @@ enum empower_packet_types {
 
 	// Set channel
 	EMPOWER_PT_SET_CHANNEL = 0x34,		// ac -> wtp
-	EMPOWER_PT_CHANNEL_RESPONSE = 0x35	// wtp -> ac
+	EMPOWER_PT_CHANNEL_RESPONSE = 0x35,	// wtp -> ac
 	// scan request
 	EMPOWER_PT_SCAN_REQUEST = 0x36,		// ac -> wtp
 
