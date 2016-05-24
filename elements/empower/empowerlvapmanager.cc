@@ -1054,27 +1054,27 @@ void EmpowerLVAPManager::send_scan_response() {
 
 	pclose(in);
 
-	// int len = sizeof(empower_scan_response);
+	int len = sizeof(empower_scan_response);
 
-	// WritablePacket *p = Packet::make(len);
+	WritablePacket *p = Packet::make(len);
 
-	// if (!p) {
-	// 	click_chatter("%{element} :: %s :: cannot make packet!",
-	// 				  this,
-	// 				  __func__);
-	// 	return;
-	// }
+	if (!p) {
+		click_chatter("%{element} :: %s :: cannot make packet!",
+					  this,
+					  __func__);
+		return;
+	}
 
-	// memset(p->data(), 0, p->length());
+	memset(p->data(), 0, p->length());
 
-	// empower_scan_response *chan = (struct empower_scan_response *) (p->data());
-	// chan->set_version(_empower_version);
-	// chan->set_length(len + o.length());
-	// chan->set_seq(get_next_seq());
-	// chan->set_type(EMPOWER_PT_SCAN_RESPONSE);
-	// chan->set_scan(o);
+	empower_scan_response *chan = (struct empower_scan_response *) (p->data());
+	chan->set_version(_empower_version);
+	chan->set_length(len + o.length());
+	chan->set_seq(get_next_seq());
+	chan->set_type(EMPOWER_PT_SCAN_RESPONSE);
+	chan->set_scan(o);
 
-	// output(0).push(p);
+	output(0).push(p);
 }
 
 int EmpowerLVAPManager::handle_add_lvap(Packet *p, uint32_t offset) {
