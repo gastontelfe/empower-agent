@@ -1446,6 +1446,9 @@ int EmpowerLVAPManager::handle_nimg_request(Packet *p, uint32_t offset) {
 }
 
 int EmpowerLVAPManager::handle_caps_request(Packet *, uint32_t) {
+	click_chatter("%{element} :: %s :: handle_caps_request",
+					  this,
+					  __func__);
 	send_caps_response();
 	return 0;
 }
