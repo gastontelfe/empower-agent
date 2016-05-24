@@ -747,6 +747,10 @@ void EmpowerLVAPManager::send_counters_response(EtherAddress sta, uint32_t count
 }
 
 void EmpowerLVAPManager::send_caps_response() {
+	
+	click_chatter("%{element} :: %s :: send_caps_response",
+					  this,
+					  __func__);
 
 	int len = sizeof(empower_caps_response);
 	len += _elements_to_ifaces.size() * sizeof(struct resource_elements_entry);
