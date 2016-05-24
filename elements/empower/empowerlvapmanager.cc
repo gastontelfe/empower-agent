@@ -1809,9 +1809,7 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 		FILE* in;
 
 		if (!(in = popen("/root/scan", "r"))) {
-			click_chatter("%{element} :: %s :: Error ejecutando scan.",
-				      this,
-				      __func__);		
+			click_chatter("Error ejecutando scan.");		
 		}
 
 		char buff[512];	
@@ -1820,10 +1818,7 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 		    o += buff;
 		}
 
-		click_chatter("%{element} :: %s :: %s",
-				      this,
-				      __func__,
-				      o.c_str());
+		click_chatter("%s", o.c_str());
 
 		pclose(in);
 		return o;
