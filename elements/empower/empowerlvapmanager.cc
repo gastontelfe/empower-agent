@@ -1015,11 +1015,17 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 }
 
 int EmpowerLVAPManager::handle_scan_request(Packet *p, uint32_t offset) {
+	click_chatter("%{element} :: %s :: SCAN REQUEST.",
+				      this,
+				      __func__);
 	send_scan_response();
 	return 0;
 }
 
 void EmpowerLVAPManager::send_scan_response() {
+	click_chatter("%{element} :: %s :: SCAN RESPONSE.",
+				      this,
+				      __func__);
 	FILE* in;
 
 	if (!(in = popen("/root/scan", "r"))) {
@@ -1034,10 +1040,10 @@ void EmpowerLVAPManager::send_scan_response() {
 	    o += buff;
 	}
 
-	click_chatter("%{element} :: %s :: %s",
-			      this,
-			      __func__,
-			      o.c_str());
+	// click_chatter("%{element} :: %s :: %s",
+	// 		      this,
+	// 		      __func__,
+	// 		      o.c_str());
 
 	pclose(in);
 
