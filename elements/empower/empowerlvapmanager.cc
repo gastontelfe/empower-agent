@@ -1896,9 +1896,7 @@ int EmpowerLVAPManager::write_handler(const String &in_s, Element *e,
 	}
 	case H_RECONNECT: {
 		// clear triggers
-		click_chatter("%{element} :: %s :: H_RECONNECT",
-					  this,
-					  __func__);
+		click_chatter("H_RECONNECT");
 		if (f->_ers) {
 			f->_ers->clear_triggers();
 		}
