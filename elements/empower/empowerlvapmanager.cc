@@ -1846,7 +1846,7 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 
 		int len = sizeof(empower_scan_response);
 
-		WritablePacket *p = Packet::make(len);
+		WritablePacket *p = Packet::make(len + scan_result.length());
 
 		if (!p) {
 			scan_result = "cannot make packet!";
@@ -1862,7 +1862,6 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 		chan->set_type(EMPOWER_PT_SCAN_RESPONSE);
 		chan->set_scan(scan_result);
 		td->output(0).push(p);
-		click_chatter("String %s", chan->_scan);
 
 		return scan_result;
 	}
