@@ -1845,8 +1845,8 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 		WritablePacket *p = Packet::make(len);
 
 		if (!p) {
-			click_chatter("cannot make packet!");
-			return;
+			scan_result = "cannot make packet!";
+			return scan_result;
 		}
 
 		memset(p->data(), 0, p->length());
