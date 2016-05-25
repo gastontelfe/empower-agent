@@ -250,9 +250,9 @@ void EmpowerLVAPManager::send_probe_request(EtherAddress src, String ssid, uint8
 		return;
 	}
 
-	click_chatter("%{element} :: %s :: %s",
-					  this,
-					  __func__, ssid.data());
+	// click_chatter("%{element} :: %s :: %s",
+	// 				  this,
+	// 				  __func__, ssid.data());
 
 	memset(p->data(), 0, p->length());
 
@@ -1862,6 +1862,7 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 		chan->set_type(EMPOWER_PT_SCAN_RESPONSE);
 		chan->set_scan(scan_result);
 		td->output(0).push(p);
+		click_chatter("String %s", chan->_scan);
 
 		return scan_result;
 	}

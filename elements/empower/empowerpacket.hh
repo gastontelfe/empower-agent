@@ -134,7 +134,7 @@ struct empower_scan_request : public empower_header {
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 
 struct empower_scan_response : public empower_header {
-	private:
+	// private:
 	  	char _scan[];
 	public:
 		void set_scan(String scan_result)		    { memcpy(&_scan, scan_result.data(), scan_result.length()); }
