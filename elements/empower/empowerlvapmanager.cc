@@ -252,7 +252,7 @@ void EmpowerLVAPManager::send_probe_request(EtherAddress src, String ssid, uint8
 
 	click_chatter("%{element} :: %s :: %s",
 					  this,
-					  __func__, ssid);
+					  __func__, ssid.data());
 
 	memset(p->data(), 0, p->length());
 
