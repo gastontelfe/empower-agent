@@ -1003,16 +1003,9 @@ int EmpowerLVAPManager::handle_set_channel(Packet *p, uint32_t offset) {
 
 	pclose(in);
 
-	EtherAddress _hwaddr;
-	
-	for (IfIter iter = _elements_to_ifaces.begin(); iter.live(); iter++) {
-		_hwaddr = iter.key()._hwaddr;
-		break;
-	}
-
 	_ifaces_to_elements.clear();
 	_elements_to_ifaces.clear();
-	ResourceElement elm = ResourceElement(_hwaddr, channel, EMPOWER_BT_L20);
+	ResourceElement elm = ResourceElement(_wtp, channel, EMPOWER_BT_L20);
 	_ifaces_to_elements.set(0, elm);
 	_elements_to_ifaces.set(elm, 0);
 	
@@ -1041,16 +1034,18 @@ void EmpowerLVAPManager::send_scan_response() {
 			      __func__);		
 	}
 
-	char buff[512];	
+	char buff[512];
+	memset(buff, 0, 512);
 	String o;
 	while(fgets(buff, sizeof(buff), in)!=NULL) {
 	    o += buff;
+	    memset(buff, 0, 512);
 	}
 
-	// click_chatter("%{element} :: %s :: %s",
-	// 		      this,
-	// 		      __func__,
-	// 		      o.c_str());
+	click_chatter("%{element} :: %s :: %s",
+			      this,
+			      __func__,
+			      o.c_str());
 
 	pclose(in);
 
