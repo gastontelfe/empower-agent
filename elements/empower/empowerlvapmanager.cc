@@ -1837,7 +1837,7 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 	}
 	case H_TESTSCAN: {
 		String scan_result = "probando mandar un string";
-		char _scan [scan_result.lengt()];
+		char _scan[scan_result.length()];
 		memcpy(&_scan, scan_result.data(), scan_result.length());
 
 		int len = sizeof(empower_scan_response);
@@ -1845,9 +1845,7 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 		WritablePacket *p = Packet::make(len);
 
 		if (!p) {
-			click_chatter("%{element} :: %s :: cannot make packet!",
-						  this,
-						  __func__);
+			click_chatter("cannot make packet!",
 			return;
 		}
 
