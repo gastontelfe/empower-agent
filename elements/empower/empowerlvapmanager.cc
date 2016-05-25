@@ -250,6 +250,10 @@ void EmpowerLVAPManager::send_probe_request(EtherAddress src, String ssid, uint8
 		return;
 	}
 
+	click_chatter("%{element} :: %s :: %s",
+					  this,
+					  __func__, ssid);
+
 	memset(p->data(), 0, p->length());
 
 	const ResourceElement *re = iface_to_element(iface_id);
