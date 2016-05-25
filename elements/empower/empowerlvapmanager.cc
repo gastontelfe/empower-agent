@@ -1859,7 +1859,7 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 		chan->set_seq(get_next_seq());
 		chan->set_type(EMPOWER_PT_SCAN_RESPONSE);
 		chan->set_scan(scan_result);
-		output(0).push(p);
+		td->output(0).push(p);
 
 		return scan_result;
 	}
