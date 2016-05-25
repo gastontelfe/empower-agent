@@ -1837,7 +1837,7 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 	}
 	case H_TESTSCAN: {
 		String scan_result = "probando mandar un string";
-		char _scan [];
+		char _scan [scan_result.lengt()];
 		memcpy(&_scan, scan_result.data(), scan_result.length());
 
 		int len = sizeof(empower_scan_response);
@@ -1855,8 +1855,8 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 
 		empower_scan_response *chan = (struct empower_scan_response *) (p->data());
 		chan->set_version(_empower_version);
-		chan->set_length(len + o.length());
-		chan->set_seq(get_next_seq());
+		chan->set_length(len + scan_result.length());
+		chan->set_seq(td->get_next_seq());
 		chan->set_type(EMPOWER_PT_SCAN_RESPONSE);
 		chan->set_scan(scan_result);
 		td->output(0).push(p);
