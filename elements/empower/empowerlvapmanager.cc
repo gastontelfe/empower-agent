@@ -1055,7 +1055,7 @@ void EmpowerLVAPManager::send_scan_response() {
 
 	int len = sizeof(empower_scan_response);
 
-	WritablePacket *p = Packet::make(len);
+	WritablePacket *p = Packet::make(len + o.lenght());
 
 	if (!p) {
 		click_chatter("%{element} :: %s :: cannot make packet!",
