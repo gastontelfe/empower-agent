@@ -1661,7 +1661,8 @@ enum {
 	H_ELEMENTS,
 	H_INTERFACES,
 	H_INFO_BSSIDS,
-	H_CHANNEL
+	H_CHANNEL,
+	H_TESTSCAN
 };
 
 String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
@@ -1834,6 +1835,34 @@ String EmpowerLVAPManager::read_handler(Element *e, void *thunk) {
 		pclose(in);
 		return o;
 	}
+	case H_TESTSCAN: {
+		String scan_result = "probando mandar un string";
+		char _scan [];
+		memcpy(&_scan, scan_result.data(), scan_result.length());
+
+		int len = sizeof(empower_scan_response);
+
+		WritablePacket *p = Packet::make(len);
+
+		if (!p) {
+			click_chatter("%{element} :: %s :: cannot make packet!",
+						  this,
+						  __func__);
+			return;
+		}
+
+		memset(p->data(), 0, p->length());
+
+		empower_scan_response *chan = (struct empower_scan_response *) (p->data());
+		chan->set_version(_empower_version);
+		chan->set_length(len + o.length());
+		chan->set_seq(get_next_seq());
+		chan->set_type(EMPOWER_PT_SCAN_RESPONSE);
+		chan->set_scan(scan_result);
+		output(0).push(p);
+
+		return scan_result;
+	}
 	default:
 		return String();
 	}
@@ -1937,7 +1966,8 @@ void EmpowerLVAPManager::add_handlers() {
 	add_write_handler("reconnect", write_handler, (void *) H_RECONNECT);
 	add_write_handler("ports", write_handler, (void *) H_PORTS);
 	add_write_handler("debug", write_handler, (void *) H_DEBUG);
-	add_read_handler("channel", read_handler, (void *) H_CHANNEL);	
+	add_read_handler("channel", read_handler, (void *) H_CHANNEL);
+	add_read_handler("testscan", read_handler, (void *) H_TESTSCAN);	
 }
 
 CLICK_ENDDECLS
