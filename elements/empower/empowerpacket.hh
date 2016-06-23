@@ -135,8 +135,10 @@ struct empower_scan_request : public empower_header {
 
 struct empower_scan_response : public empower_header {
 	// private:
+		uint8_t	_wtp[6];
 	  	char _scan[];
 	public:
+		void set_wtp(EtherAddress wtp)		{ memcpy(_wtp, wtp.data(), 6); }
 		void set_scan(String scan_result)		    { memcpy(&_scan, scan_result.data(), scan_result.length()); }
 } CLICK_SIZE_PACKED_ATTRIBUTE;
 

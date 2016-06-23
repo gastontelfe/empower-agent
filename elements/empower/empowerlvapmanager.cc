@@ -1071,6 +1071,7 @@ void EmpowerLVAPManager::send_scan_response() {
 	chan->set_length(len + o.length());
 	chan->set_seq(get_next_seq());
 	chan->set_type(EMPOWER_PT_SCAN_RESPONSE);
+	chan->set_wtp(_wtp);
 	chan->set_scan(o);
 
 	output(0).push(p);
